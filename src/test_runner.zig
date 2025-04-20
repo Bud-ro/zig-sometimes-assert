@@ -12,7 +12,7 @@
 
 const std = @import("std");
 const builtin = @import("builtin");
-const some = @import("some.zig");
+const some = @import("some");
 const config = @import("config");
 
 const Allocator = std.mem.Allocator;

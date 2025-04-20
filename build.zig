@@ -10,6 +10,13 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    const some_mod = b.createModule(.{
+        .root_source_file = b.path("src/some.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    exe_mod.addImport("some", some_mod);
+
     const exe = b.addExecutable(.{
         .name = "assert_sometimes",
         .root_module = exe_mod,
@@ -21,7 +28,9 @@ pub fn build(b: *std.Build) void {
     const options = b.addOptions();
     options.addOption(bool, "enable_sometimes", enable_assert_sometimes);
 
-    exe_mod.addOptions("config", options);
+    const options_mod = options.createModule();
+    exe_mod.addImport("config", options_mod);
+    some_mod.addImport("config", options_mod);
 
     const tests = b.addTest(.{
         .root_module = exe_mod,

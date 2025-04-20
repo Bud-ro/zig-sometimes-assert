@@ -22,4 +22,4 @@ test "simple test" {
 }
 
 const std = @import("std");
-const some = @import("some.zig");
+const some = @import("some");
