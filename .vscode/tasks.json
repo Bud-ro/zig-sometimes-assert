@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "zig-build-exe",
+            "command": "zig build",
+            "type": "shell",
+        },
+        {
+            "label": "zig-build-test",
+            "command": "zig test --test-runner src/test_runner.zig -femit-bin=zig-out/bin/test --test-no-exec src/main.zig",
+            "type": "shell",
+        }
+    ]
+}

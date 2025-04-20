@@ -16,12 +16,26 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(exe);
 
-    const exe_unit_tests = b.addTest(.{
+    const enable_assert_sometimes = b.option(bool, "enable_sometimes", "Enable the effect of assert_sometimes") orelse false;
+
+    const options = b.addOptions();
+    options.addOption(bool, "enable_sometimes", enable_assert_sometimes);
+
+    exe_mod.addOptions("config", options);
+
+    const tests = b.addTest(.{
         .root_module = exe_mod,
+        .test_runner = .{
+            .path = b.path("src/test_runner.zig"),
+            .mode = .simple,
+        },
     });
 
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
+    const run_tests = b.addRunArtifact(tests);
+    const tests_artifact = b.addInstallArtifact(tests, .{ .dest_dir = .{ .override = .{ .custom = "test" } } });
 
     const test_step = b.step("test", "Run unit tests");
-    test_step.dependOn(&run_exe_unit_tests.step);
+    test_step.dependOn(&run_tests.step);
+
+    run_tests.step.dependOn(&tests_artifact.step);
 }
