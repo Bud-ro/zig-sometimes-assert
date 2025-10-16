@@ -130,6 +130,7 @@ pub fn main() !void {
         }
     }
 
+    var failed_sometimes: usize = 0;
     if (config.enable_sometimes) {
         var it = sometimes.info.iterator();
         while (it.next()) |c| {
@@ -137,11 +138,10 @@ pub fn main() !void {
                 const ctx = c.key_ptr.*;
                 if (c.value_ptr.* == .always_false) {
                     Printer.status(.fail, "Sometimes assert was always false: {s}:{}:{}", .{ ctx.file, ctx.line, ctx.column });
-                    fail += 1;
                 } else if (c.value_ptr.* == .always_true) {
                     Printer.status(.fail, "Sometimes assert was always true: {s}:{}:{}", .{ ctx.file, ctx.line, ctx.column });
-                    fail += 1;
                 }
+                failed_sometimes += 1;
             }
         }
     }
@@ -155,10 +155,13 @@ pub fn main() !void {
     if (leak > 0) {
         Printer.status(.fail, "{d} test{s} leaked\n", .{ leak, if (leak != 1) "s" else "" });
     }
+    if (failed_sometimes > 0) {
+        Printer.status(.fail, "{d} sometimes assertion{s} not covered\n", .{ failed_sometimes, if (failed_sometimes != 1) "s" else "" });
+    }
     Printer.fmt("\n", .{});
     try slowest.display();
     Printer.fmt("\n", .{});
-    std.posix.exit(if (fail == 0) 0 else 1);
+    std.posix.exit(if (fail == 0 and failed_sometimes == 0) 0 else 1);
 }
 
 const Printer = struct {
