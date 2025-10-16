@@ -12,7 +12,7 @@
         },
         {
             "name": "test",
-            // "preLaunchTask": "zig-build-test",
+            "preLaunchTask": "zig-build-test",
             "request": "launch",
             "type": "cppvsdbg",
             "program": "${workspaceFolder}/zig-out/test/test.exe",

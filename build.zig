@@ -11,11 +11,11 @@ pub fn build(b: *std.Build) void {
     });
 
     const some_mod = b.createModule(.{
-        .root_source_file = b.path("src/some.zig"),
+        .root_source_file = b.path("src/sometimes.zig"),
         .target = target,
         .optimize = optimize,
     });
-    exe_mod.addImport("some", some_mod);
+    exe_mod.addImport("sometimes", some_mod);
 
     const exe = b.addExecutable(.{
         .name = "assert_sometimes",

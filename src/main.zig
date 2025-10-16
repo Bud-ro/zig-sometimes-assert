@@ -1,25 +1,37 @@
-//! Entry point, `assert_sometimes` should be stripped out for non-test builds
+//! Entry point, `sometimes.assert` should be stripped out for non-test builds
 
 pub fn main() !void {
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    var buffer: [4096]u8 = undefined;
+    var output_writer: std.fs.File.Writer = std.fs.File.stdout().writer(&buffer);
+    const writer: *std.Io.Writer = &output_writer.interface;
 
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
-
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
-
-    try bw.flush();
+    try writer.writeAll("Hello World 1!\n");
+    sometimes.assert(&@src(), false);
+    try writer.writeAll("Hello World 2!\n");
+    try writer.flush();
 }
 
 test "simple test" {
-    some.assert_sometimes(&@src(), false);
+    var list: std.ArrayList(i32) = try .initCapacity(std.testing.allocator, 10);
+    defer list.deinit(std.testing.allocator);
 
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
+    sometimes.assert(&@src(), false);
+
+    try list.append(std.testing.allocator, 42);
     try std.testing.expectEqual(@as(i32, 42), list.pop());
 }
 
+fn myFunc(dummy: bool) void {
+    sometimes.assert(&@src(), dummy);
+}
+
+test "test 1 myFunc" {
+    myFunc(false);
+}
+
+test "test 2 myFunc" {
+    myFunc(true);
+}
+
 const std = @import("std");
-const some = @import("some");
+const sometimes = @import("sometimes");
