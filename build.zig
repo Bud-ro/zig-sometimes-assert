@@ -4,14 +4,19 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const exe_mod = b.createModule(.{
-        .root_source_file = b.path("src/main.zig"),
+    const enable_assert_sometimes = b.option(bool, "enable_sometimes", "Enable the effect of assert_sometimes (default: true)") orelse false;
+    const options = b.addOptions();
+    options.addOption(bool, "enable_sometimes", enable_assert_sometimes);
+
+    const some_mod = b.addModule("sometimes", .{
+        .root_source_file = b.path("src/sometimes.zig"),
         .target = target,
         .optimize = optimize,
     });
+    some_mod.addOptions("sometimes_config", options);
 
-    const some_mod = b.createModule(.{
-        .root_source_file = b.path("src/sometimes.zig"),
+    const exe_mod = b.createModule(.{
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -22,15 +27,6 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
     b.installArtifact(exe);
-
-    const enable_assert_sometimes = b.option(bool, "enable_sometimes", "Enable the effect of assert_sometimes (default: true)") orelse true;
-
-    const options = b.addOptions();
-    options.addOption(bool, "enable_sometimes", enable_assert_sometimes);
-
-    const options_mod = options.createModule();
-    exe_mod.addImport("config", options_mod);
-    some_mod.addImport("config", options_mod);
 
     const tests = b.addTest(.{
         .root_module = exe_mod,

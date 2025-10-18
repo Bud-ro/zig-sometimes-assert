@@ -9,8 +9,8 @@
 
 const std = @import("std");
 const sometimes = @import("sometimes");
+const sometimes_config = sometimes.config;
 const builtin = @import("builtin");
-const config = @import("config");
 
 const Allocator = std.mem.Allocator;
 
@@ -131,7 +131,7 @@ pub fn main() !void {
     }
 
     var failed_sometimes: usize = 0;
-    if (config.enable_sometimes) {
+    if (sometimes_config.enable_sometimes) {
         var it = sometimes.info.iterator();
         while (it.next()) |c| {
             if (c.value_ptr.* != .mixed) {
@@ -269,7 +269,7 @@ const Env = struct {
 
     fn init(allocator: Allocator) Env {
         return .{
-            .verbose = readEnvBool(allocator, "TEST_VERBOSE", true),
+            .verbose = readEnvBool(allocator, "TEST_VERBOSE", false),
             .fail_first = readEnvBool(allocator, "TEST_FAIL_FIRST", false),
             .filter = readEnv(allocator, "TEST_FILTER"),
         };
@@ -292,8 +292,8 @@ const Env = struct {
         return v;
     }
 
-    fn readEnvBool(allocator: Allocator, key: []const u8, deflt: bool) bool {
-        const value = readEnv(allocator, key) orelse return deflt;
+    fn readEnvBool(allocator: Allocator, key: []const u8, default: bool) bool {
+        const value = readEnv(allocator, key) orelse return default;
         defer allocator.free(value);
         return std.ascii.eqlIgnoreCase(value, "true");
     }

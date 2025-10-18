@@ -15,29 +15,30 @@ pub fn assert(
     ok: bool,
 ) void {
     if (comptime config.enable_sometimes) {
-        if (info.get(src)) |v| {
-            switch (v) {
+        const val = info.getOrPut(src) catch @panic("Out of memory");
+        if (val.found_existing) {
+            switch (val.value_ptr.*) {
                 .always_false => {
                     if (ok) {
-                        info.put(src, .mixed) catch @panic("Out of memory");
+                        val.value_ptr.* = .mixed;
                     }
                 },
                 .always_true => {
                     if (!ok) {
-                        info.put(src, .mixed) catch @panic("Out of memory");
+                        val.value_ptr.* = .mixed;
                     }
                 },
                 .mixed => {},
             }
         } else {
             if (ok) {
-                info.put(src, .always_true) catch @panic("Out of memory");
+                val.value_ptr.* = .always_true;
             } else {
-                info.put(src, .always_false) catch @panic("Out of memory");
+                val.value_ptr.* = .always_false;
             }
         }
     }
 }
 
 const std = @import("std");
-const config = @import("config");
+pub const config = @import("sometimes_config");
