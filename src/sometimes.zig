@@ -1,7 +1,5 @@
 //! Declarations relevant to "Sometimes Assertions"
 //! Inspired by https://antithesis.com/docs/best_practices/sometimes_assertions/
-//! To use this, add the custom test runner and a some_decls to any files
-//! which use `assert_sometimes`
 
 /// This must be initialized by the test runner
 pub var info: std.hash_map.AutoHashMap(*const std.builtin.SourceLocation, SometimesType) = undefined;

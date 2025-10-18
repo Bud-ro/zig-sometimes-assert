@@ -137,9 +137,9 @@ pub fn main() !void {
             if (c.value_ptr.* != .mixed) {
                 const ctx = c.key_ptr.*;
                 if (c.value_ptr.* == .always_false) {
-                    Printer.status(.fail, "Sometimes assert was always false: {s}:{}:{}", .{ ctx.file, ctx.line, ctx.column });
+                    Printer.status(.fail, "Sometimes assert was always false: {s}:{}:{}\n", .{ ctx.file, ctx.line, ctx.column });
                 } else if (c.value_ptr.* == .always_true) {
-                    Printer.status(.fail, "Sometimes assert was always true: {s}:{}:{}", .{ ctx.file, ctx.line, ctx.column });
+                    Printer.status(.fail, "Sometimes assert was always true: {s}:{}:{}\n", .{ ctx.file, ctx.line, ctx.column });
                 }
                 failed_sometimes += 1;
             }

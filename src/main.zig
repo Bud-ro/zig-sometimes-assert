@@ -6,22 +6,19 @@ pub fn main() !void {
     const writer: *std.Io.Writer = &output_writer.interface;
 
     try writer.writeAll("Hello World 1!\n");
-    sometimes.assert(&@src(), false);
+    sometimes.assert(&@src(), true); // These both show up in the output
+    sometimes.assert(&@src(), false); // Because they fail to cover the other case
     try writer.writeAll("Hello World 2!\n");
     try writer.flush();
-}
 
-test "simple test" {
-    var list: std.ArrayList(i32) = try .initCapacity(std.testing.allocator, 10);
-    defer list.deinit(std.testing.allocator);
-
-    sometimes.assert(&@src(), false);
-
-    try list.append(std.testing.allocator, 42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+    myOtherFunc(true);
 }
 
 fn myFunc(dummy: bool) void {
+    sometimes.assert(&@src(), dummy);
+}
+
+fn myOtherFunc(dummy: bool) void {
     sometimes.assert(&@src(), dummy);
 }
 
@@ -31,6 +28,14 @@ test "test 1 myFunc" {
 
 test "test 2 myFunc" {
     myFunc(true);
+}
+
+test "myOtherFunc false" {
+    myOtherFunc(false); // No need to test for the `true` case because `main` covers this for us!
+}
+
+test "main test" {
+    try main();
 }
 
 const std = @import("std");

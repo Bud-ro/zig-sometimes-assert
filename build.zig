@@ -23,7 +23,7 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(exe);
 
-    const enable_assert_sometimes = b.option(bool, "enable_sometimes", "Enable the effect of assert_sometimes") orelse false;
+    const enable_assert_sometimes = b.option(bool, "enable_sometimes", "Enable the effect of assert_sometimes (default: true)") orelse true;
 
     const options = b.addOptions();
     options.addOption(bool, "enable_sometimes", enable_assert_sometimes);
