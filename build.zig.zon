@@ -1,6 +1,6 @@
 .{
     .name = .assert_sometimes,
-    .version = "0.0.0",
+    .version = "0.0.1",
     .fingerprint = 0x8ebc1cc04c698bab, // Changing this has security and trust implications.
     .minimum_zig_version = "0.15.1",
     .paths = .{

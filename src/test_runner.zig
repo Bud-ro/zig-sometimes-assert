@@ -1,5 +1,6 @@
 // Note that this was copied from https://gist.github.com/karlseguin/c6bea5b35e4e8d26af6f81c22cb5d76b
-// And modified to suit my needs
+// And modified to suit my needs. MIT licensed: https://gist.github.com/karlseguin/c6bea5b35e4e8d26af6f81c22cb5d76b?permalink_comment_id=5423851#gistcomment-5423851
+// Modifications are also provided under the MIT license
 
 // in your build.zig, you can specify a custom test runner:
 // const tests = b.addTest(.{
@@ -46,19 +47,6 @@ pub fn main() !void {
     Printer.fmt("\r\x1b[0K", .{}); // beginning of line and clear to end of line
 
     for (builtin.test_functions) |t| {
-        if (isSetup(t)) {
-            t.func() catch |err| {
-                Printer.status(.fail, "\nsetup \"{s}\" failed: {}\n", .{ t.name, err });
-                return err;
-            };
-        }
-    }
-
-    for (builtin.test_functions) |t| {
-        if (isSetup(t) or isTeardown(t)) {
-            continue;
-        }
-
         var status = Status.pass;
         slowest.startTiming();
 
@@ -107,9 +95,6 @@ pub fn main() !void {
                 if (@errorReturnTrace()) |trace| {
                     std.debug.dumpStackTrace(trace.*);
                 }
-                if (env.fail_first) {
-                    break;
-                }
             },
         }
 
@@ -118,15 +103,6 @@ pub fn main() !void {
             Printer.status(status, "{s} ({d:.2}ms)\n", .{ friendly_name, ms });
         } else {
             Printer.status(status, ".", .{});
-        }
-    }
-
-    for (builtin.test_functions) |t| {
-        if (isTeardown(t)) {
-            t.func() catch |err| {
-                Printer.status(.fail, "\nteardown \"{s}\" failed: {}\n", .{ t.name, err });
-                return err;
-            };
         }
     }
 
@@ -264,13 +240,11 @@ const SlowTracker = struct {
 
 const Env = struct {
     verbose: bool,
-    fail_first: bool,
     filter: ?[]const u8,
 
     fn init(allocator: Allocator) Env {
         return .{
             .verbose = readEnvBool(allocator, "TEST_VERBOSE", false),
-            .fail_first = readEnvBool(allocator, "TEST_FAIL_FIRST", false),
             .filter = readEnv(allocator, "TEST_FILTER"),
         };
     }
@@ -314,12 +288,4 @@ fn isUnnamed(t: std.builtin.TestFn) bool {
     const index = std.mem.indexOf(u8, test_name, marker) orelse return false;
     _ = std.fmt.parseInt(u32, test_name[index + marker.len ..], 10) catch return false;
     return true;
-}
-
-fn isSetup(t: std.builtin.TestFn) bool {
-    return std.mem.endsWith(u8, t.name, "tests:beforeAll");
-}
-
-fn isTeardown(t: std.builtin.TestFn) bool {
-    return std.mem.endsWith(u8, t.name, "tests:afterAll");
 }
