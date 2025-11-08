@@ -11,15 +11,16 @@ pub fn main() !void {
     try writer.writeAll("Hello World 2!\n");
     try writer.flush();
 
-    myOtherFunc(true);
+    _ = myOtherFunc(true);
 }
 
 fn myFunc(dummy: bool) void {
     sometimes.assert(&@src(), dummy);
 }
 
-fn myOtherFunc(dummy: bool) void {
+fn myOtherFunc(dummy: bool) bool {
     sometimes.assert(&@src(), dummy);
+    return true;
 }
 
 test "test 1 myFunc" {
@@ -31,7 +32,16 @@ test "test 2 myFunc" {
 }
 
 test "myOtherFunc false" {
-    myOtherFunc(false); // No need to test for the `true` case because `main` covers this for us!
+    try std.testing.expect(myOtherFunc(false)); // No need to test for the `true` case because `main` covers this for us!
+}
+
+test "comptime is ignored as part of function" {
+    const returnValue = comptime myOtherFunc(false);
+    try std.testing.expect(returnValue);
+}
+
+test "comptime is ignored when done directly" {
+    comptime sometimes.assert(&@src(), true);
 }
 
 test "main test" {
