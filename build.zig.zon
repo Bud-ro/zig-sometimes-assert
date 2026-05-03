@@ -1,8 +1,8 @@
 .{
     .name = .assert_sometimes,
-    .version = "0.0.2",
+    .version = "0.1.0",
     .fingerprint = 0x8ebc1cc04c698bab, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.15.1",
+    .minimum_zig_version = "0.16.0",
     .paths = .{
         "build.zig",
         "build.zig.zon",

@@ -2,7 +2,8 @@
 
 pub fn main() !void {
     var buffer: [4096]u8 = undefined;
-    var output_writer: std.fs.File.Writer = std.fs.File.stdout().writer(&buffer);
+    const io: std.Io = std.Io.Threaded.global_single_threaded.io();
+    var output_writer: std.Io.File.Writer = .initStreaming(.stdout(), io, &buffer);
     const writer: *std.Io.Writer = &output_writer.interface;
 
     try writer.writeAll("Hello World 1!\n");
