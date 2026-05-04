@@ -21,8 +21,8 @@ const BORDER = "=" ** 80;
 var current_test: ?[]const u8 = null;
 
 pub fn main(init: std.process.Init) !void {
-    const env = Env.init(init.minimal.environ);
     const allocator = init.gpa;
+    const env = Env.init(init.environ_map);
 
     var slowest = SlowTracker.init(allocator, init.io, 5);
     defer slowest.deinit(allocator);
@@ -228,13 +228,13 @@ const Env = struct {
     verbose: bool,
     filter: ?[]const u8,
 
-    fn init(environ: std.process.Environ) Env {
+    fn init(environ_map: *std.process.Environ.Map) Env {
         return .{
-            .verbose = if (environ.getPosix("TEST_VERBOSE")) |v|
+            .verbose = if (environ_map.get("TEST_VERBOSE")) |v|
                 std.ascii.eqlIgnoreCase(v, "true")
             else
                 false,
-            .filter = environ.getPosix("TEST_FILTER"),
+            .filter = environ_map.get("TEST_FILTER"),
         };
     }
 };
